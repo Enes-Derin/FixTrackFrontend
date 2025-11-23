@@ -1,17 +1,25 @@
-# React + Vite
+# FixTrack Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**FixTrack** projesinin ön yüzü, modern web teknolojileriyle geliştirilmiş bir servis takip sistemidir.  
+Amacı: saha servislerini, bakım durumlarını ve operasyon takibini verimli bir şekilde yönetmek.
 
-Currently, two official plugins are available:
+## Teknolojiler & Yetkinlikler
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React (Vite)**: Hızlı ve modern ön yüz geliştirme
+- **State Management**: Redux Tool Kit
+- **Responsive Design**: Mobil ve masaüstü uyumlu, kullanıcı odaklı arayüz
+- **JWT & Yetkilendirme**: Rol bazlı erişim kontrolü
+- **Bootstrap**: Temiz ve ölçeklenebilir tasarım
+- **API Integration**: Backend ile gerçek zamanlı veri akışı
 
-## React Compiler
+## Öne Çıkan Özellikler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Yönetici ve teknisyen rolleri için ayrı paneller
+- Servis listesi ve detay sayfaları
+- Kolay servis formu oluşturma
 
-## Expanding the ESLint configuration
+## 💡 Proje Vizyonu
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-"# FixTrackFrontend" 
+FixTrack Frontend, **tamamen işlevsel, kullanıcı odaklı ve modern frontend uygulaması** örneğidir.  
+Amacımız, sadece görsel olarak değil, aynı zamanda **teknik yetkinliklerimizi ve modern frontend pratiklerini** göstermek.
+
