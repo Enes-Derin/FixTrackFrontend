@@ -1,7 +1,7 @@
 # FixTrack Frontend
 
 **FixTrack** projesinin ön yüzü, modern web teknolojileriyle geliştirilmiş bir servis takip sistemidir.  
-Amacı: saha servislerini, bakım durumlarını ve operasyon takibini verimli bir şekilde yönetmek.
+Amacı: saha servislerini ve operasyon takibini verimli bir şekilde yönetmek.
 
 ## Teknolojiler & Yetkinlikler
 
