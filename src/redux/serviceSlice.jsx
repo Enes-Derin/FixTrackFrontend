@@ -1,201 +1,192 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axiosInstance from "../api/axiosInstance";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    getServices,
+    getServiceByCustomerId,
+    deleteService,
+} from "../redux/serviceSlice";
+import { getCustomers } from "../redux/customesSlice";
+import {
+    Container,
+    Row,
+    Col,
+    Card,
+    Button,
+    Spinner,
+    Form,
+    Badge,
+} from "react-bootstrap";
 
-const getAuthHeader = () => {
-    const token = localStorage.getItem("accessToken");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-};
+function ServicePage() {
+    const dispatch = useDispatch();
 
-export const getServices = createAsyncThunk(
-    "getServices",
-    async () => {
-        try {
-            const response = await axiosInstance.get("/service-form", {
-                headers: getAuthHeader(),
-            });
-            return response.data.payload;
-        } catch (error) {
-            throw error;
+    const { services, isLoading } = useSelector((state) => state.service);
+    const customers = useSelector((state) => state.customer.customers);
+
+    const [customerId, setCustomerId] = useState("");
+    const [isFiltered, setIsFiltered] = useState(false);
+
+    // İlk yükleme
+    useEffect(() => {
+        dispatch(getServices());
+        dispatch(getCustomers());
+    }, [dispatch]);
+
+    // Filtre tetikleme
+    const handleFilter = () => {
+        if (customerId) {
+            setIsFiltered(true);
+            dispatch(getServiceByCustomerId(customerId));
+        } else {
+            setIsFiltered(false);
+            dispatch(getServices());
         }
-    }
-);
+    };
 
-export const getServiceById = createAsyncThunk(
-    "getServiceById",
-    async (id) => {
-        try {
-            const response = await axiosInstance.get(`/service-form/${id}`, {
-                headers: getAuthHeader(),
-            });
-            return response.data.payload;
-        } catch (error) {
-            throw error;
+    // Silme
+    const deleteServiceById = (id) => {
+        if (window.confirm("Bu servisi silmek istediğinizden emin misiniz?")) {
+            dispatch(deleteService(id));
         }
-    }
-);
+    };
 
-export const getServiceByCustomerId = createAsyncThunk(
-    "getServiceByCustomerId",
-    async (id) => {
-        try {
-            const response = await axiosInstance.get(
-                `/service-form/customerId/${id}`,
-                {
-                    headers: getAuthHeader(),
-                }
-            );
-            return response.data.payload;
-        } catch (error) {
-            throw error;
-        }
-    }
-);
+    return (
+        <Container fluid className="py-4">
+            {/* HEADER */}
+            <Row className="align-items-center mb-4">
+                <Col>
+                    <h3 className="text-primary fw-bold mb-1">Servis Yönetimi</h3>
+                    <p className="small text-light mb-0">
+                        Tüm servis kayıtlarını buradan yönetin
+                    </p>
+                </Col>
+                <Col className="text-end">
+                    <Link to="/service/add">
+                        <Button className="custom-btn fw-semibold" size="sm">
+                            + Yeni Servis
+                        </Button>
+                    </Link>
+                </Col>
+            </Row>
 
-export const addService = createAsyncThunk(
-    "addService",
-    async (service) => {
-        try {
-            const response = await axiosInstance.post("/service-form", service, {
-                headers: getAuthHeader(),
-            });
-            return response.data.payload;
-        } catch (error) {
-            throw error;
-        }
-    }
-);
+            {/* FILTER */}
+            <Card className="border-0 shadow-sm mb-4">
+                <Card.Body>
+                    <Row className="align-items-end g-3">
+                        <Col xs={12} md={9}>
+                            <Form.Label className="small">
+                                Müşteriye Göre Filtrele
+                            </Form.Label>
+                            <Form.Select
+                                value={customerId}
+                                onChange={(e) =>
+                                    setCustomerId(e.target.value)
+                                }
+                            >
+                                <option value="">Tüm Müşteriler</option>
+                                {customers.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.company}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                        <Col xs={12} md={3}>
+                            <Button
+                                className="custom-btn w-100"
+                                onClick={handleFilter}
+                                disabled={isLoading}
+                            >
+                                Filtrele
+                            </Button>
+                        </Col>
+                    </Row>
+                </Card.Body>
+            </Card>
 
-export const deleteService = createAsyncThunk(
-    "deleteService",
-    async (id) => {
-        try {
-            const response = await axiosInstance.delete(`/service-form/delete/${id}`, {
-                headers: getAuthHeader(),
-            });
-            return response.data.payload;
-        } catch (error) {
-            throw error;
-        }
-    }
-);
+            {/* LOADING */}
+            {isLoading && (
+                <div className="text-center py-5">
+                    <Spinner animation="border" />
+                </div>
+            )}
 
-export const updateServiceSignature = createAsyncThunk(
-    "updateServiceSignature",
-    async ({ id, customerSignature, technicianSignature }) => {
-        try {
-            const response = await axiosInstance.put(
-                `/service-form/${id}/signatures`,
-                {
-                    customerSignature: customerSignature || null,
-                    technicianSignature: technicianSignature || null
-                },
-                {
-                    headers: getAuthHeader(),
-                }
-            );
-            return response.data.payload;
-        } catch (error) {
-            throw error;
-        }
-    }
-);
+            {/* EMPTY STATE */}
+            {!isLoading && services.length === 0 && (
+                <p className="text-center text-light py-5">
+                    {isFiltered
+                        ? "Seçilen müşteriye ait servis bulunamadı."
+                        : "Henüz kayıtlı servis bulunmuyor."}
+                </p>
+            )}
 
+            {/* SERVICE CARDS */}
+            <Row className="g-3">
+                {services.map((s) => (
+                    <Col xs={12} md={6} lg={4} key={s.id}>
+                        <Card className="custom-card p-3 h-100 shadow-sm">
+                            <Card.Body className="d-flex flex-column justify-content-between h-100">
+                                <div>
+                                    <div className="d-flex justify-content-between align-items-start mb-2">
+                                        <Card.Title className="fw-bold">
+                                            {s.title}
+                                        </Card.Title>
+                                        <Badge bg="secondary">
+                                            {s.customer?.company || "—"}
+                                        </Badge>
+                                    </div>
 
-export const serviciesSlice = createSlice({
-    name: "services",
-    initialState: {
-        services: [],
-        service: null,
-        isLoading: false,
-        error: null,
-    },
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(getServices.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(getServices.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.services = action.payload;
-            })
-            .addCase(getServices.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.error.message;
-            })
-            .addCase(getServiceById.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(getServiceById.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.service = action.payload;
-            })
-            .addCase(getServiceById.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.error.message;
-            })
-            .addCase(getServiceByCustomerId.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(getServiceByCustomerId.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.services = action.payload;
-            })
-            .addCase(getServiceByCustomerId.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.error.message;
-            })
-            .addCase(addService.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(addService.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.services.push(action.payload);
-            })
-            .addCase(addService.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.error.message;
-            })
-            .addCase(deleteService.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(deleteService.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.services = state.services.filter(
-                    (service) => service.id !== action.payload.id
-                );
-            })
-            .addCase(deleteService.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.error.message;
-            })
-            .addCase(updateServiceSignature.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(updateServiceSignature.fulfilled, (state, action) => {
-                state.isLoading = false;
-                const updatedService = action.payload;
-                if (state.service && state.service.id === updatedService.id) {
-                    state.service = updatedService;
-                }
-                const index = state.services.findIndex(
-                    (s) => s.id === updatedService.id
-                );
-                if (index !== -1) {
-                    state.services[index] = updatedService;
-                }
-            })
-            .addCase(updateServiceSignature.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.error.message;
-            });
-    },
-});
+                                    <Card.Text className="small">
+                                        {s.description
+                                            ? s.description.length > 70
+                                                ? s.description.slice(0, 70) +
+                                                "..."
+                                                : s.description
+                                            : "-"}
+                                    </Card.Text>
 
-export default serviciesSlice.reducer;
+                                    <div className="small mt-1">
+                                        {s.createdDate
+                                            ? new Date(
+                                                s.createdDate
+                                            ).toLocaleDateString("tr-TR")
+                                            : "-"}
+                                    </div>
+                                </div>
+
+                                <div className="mt-3 d-flex gap-2">
+                                    <Link
+                                        to={`/service/${s.id}`}
+                                        className="flex-fill text-decoration-none"
+                                    >
+                                        <Button
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            className="w-100"
+                                        >
+                                            Görüntüle
+                                        </Button>
+                                    </Link>
+
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        className="w-100"
+                                        onClick={() =>
+                                            deleteServiceById(s.id)
+                                        }
+                                    >
+                                        Sil
+                                    </Button>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+        </Container>
+    );
+}
+
+export default ServicePage;
