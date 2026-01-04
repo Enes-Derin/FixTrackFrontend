@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../api/axiosInstance";
-import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate;
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (data, { rejectWithValue }) => {
@@ -33,9 +31,9 @@ export const logoutUser = createAsyncThunk(
 );
 
 const initialState = {
-    user: null,
     accessToken: localStorage.getItem("accessToken"),
     refreshToken: localStorage.getItem("refreshToken"),
+    isAuthenticated: !!localStorage.getItem("accessToken"),
     isLoading: false,
     error: null,
 };
@@ -43,7 +41,12 @@ const initialState = {
 const authSlice = createSlice({
     name: "auth",
     initialState,
-    reducers: {},
+    reducers: {
+        setAccessToken: (state, action) => {
+            state.accessToken = action.payload;
+            state.isAuthenticated = true;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(loginUser.pending, (state) => {
@@ -52,20 +55,21 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.user = action.payload.user;
                 state.accessToken = action.payload.accessToken;
                 state.refreshToken = action.payload.refreshToken;
+                state.isAuthenticated = true;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             })
             .addCase(logoutUser.fulfilled, (state) => {
-                state.user = null;
                 state.accessToken = null;
                 state.refreshToken = null;
+                state.isAuthenticated = false;
             });
     },
 });
 
+export const { setAccessToken } = authSlice.actions;
 export default authSlice.reducer;
