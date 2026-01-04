@@ -63,7 +63,7 @@ function ServicePage() {
             {isLoading && <div className="text-center py-5"><Spinner animation="border" /></div>}
 
             {/* EMPTY */}
-            {!isLoading && services.length === 0 && <p className="text-center text-muted py-5">Henüz kayıtlı servis bulunmuyor.</p>}
+            {!isLoading && services.length === 0 && <p className="text-center text-light py-5">Henüz kayıtlı servis bulunmuyor.</p>}
 
             {/* CARDS GRID */}
             <Row className="g-3">

@@ -40,7 +40,7 @@ function CustomersPage() {
             {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
             {/* EMPTY */}
-            {!isLoading && customers.length === 0 && <p className="text-center text-muted py-5">Henüz kayıtlı müşteri bulunmuyor.</p>}
+            {!isLoading && customers.length === 0 && <p className="text-center text-light py-5">Henüz kayıtlı müşteri bulunmuyor.</p>}
 
             {/* CARDS GRID */}
             <Row className="g-3">
