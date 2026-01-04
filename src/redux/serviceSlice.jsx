@@ -32,7 +32,7 @@ export const getServiceByCustomerId = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(
-                `/service-form/customerId/${id}`
+                `/service-form/by-customer/${id}`
             );
             return response.data.payload;
         } catch (error) {

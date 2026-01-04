@@ -28,7 +28,7 @@ export const logoutUser = createAsyncThunk(
     "auth/logoutUser",
     async () => {
         localStorage.clear();
-        navigate("/login");
+        return true;
     }
 );
 
