@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
+const navigate = useNavigate;
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (data, { rejectWithValue }) => {
@@ -26,7 +28,7 @@ export const logoutUser = createAsyncThunk(
     "auth/logoutUser",
     async () => {
         localStorage.clear();
-        window.location.href = "/login";
+        navigate("/login");
     }
 );
 
