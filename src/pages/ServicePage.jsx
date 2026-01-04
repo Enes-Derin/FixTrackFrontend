@@ -33,9 +33,11 @@ function ServicePage() {
     */
     useEffect(() => {
         dispatch(getCustomers());
+    }, [dispatch]);
 
+    useEffect(() => {
         if (customerId) {
-            dispatch(getServiceByCustomerId(customerId));
+            dispatch(getServiceByCustomerId(Number(customerId)));
         } else {
             dispatch(getServices());
         }
@@ -43,7 +45,13 @@ function ServicePage() {
 
     const deleteServiceById = (id) => {
         if (window.confirm("Bu servisi silmek istediğinizden emin misiniz?")) {
-            dispatch(deleteService(id));
+            dispatch(deleteService(id)).then(() => {
+                if (customerId) {
+                    dispatch(getServiceByCustomerId(Number(customerId)));
+                } else {
+                    dispatch(getServices());
+                }
+            });
         }
     };
 
@@ -107,7 +115,7 @@ function ServicePage() {
 
             {/* LIST */}
             <Row className="g-3">
-                {services.map((s) => (
+                {Array.isArray(services) && services.map((s) => (
                     <Col xs={12} md={6} lg={4} key={s.id}>
                         <Card className="custom-card h-100 p-3 shadow-sm">
                             <Card.Body className="d-flex flex-column justify-content-between">
