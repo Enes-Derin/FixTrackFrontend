@@ -22,7 +22,7 @@ function ServicePage() {
     const dispatch = useDispatch();
 
     const { services, isLoading } = useSelector((state) => state.service);
-    const customers = useSelector((state) => state.customer.customers);
+    const { customers } = useSelector((state) => state.customer);
 
     const [customerId, setCustomerId] = useState("");
 
@@ -32,7 +32,7 @@ function ServicePage() {
         dispatch(getCustomers());
     }, [dispatch]);
 
-    /* Otomatik filtre */
+    /* Müşteri seçilince otomatik filtre */
     useEffect(() => {
         if (customerId) {
             dispatch(getServiceByCustomerId(customerId));
@@ -47,6 +47,10 @@ function ServicePage() {
         }
     };
 
+    const selectedCustomer = customers.find(
+        (c) => String(c.id) === String(customerId)
+    );
+
     return (
         <Container fluid className="py-4">
             {/* HEADER */}
@@ -56,7 +60,9 @@ function ServicePage() {
                         Servis Yönetimi
                     </h3>
                     <p className="small text-light mb-0">
-                        Tüm servis kayıtlarını buradan yönetin
+                        {selectedCustomer
+                            ? `${selectedCustomer.company} servisleri listeleniyor`
+                            : "Tüm servis kayıtları"}
                     </p>
                 </Col>
                 <Col className="text-end">
@@ -68,12 +74,9 @@ function ServicePage() {
                 </Col>
             </Row>
 
-            {/* FILTER */}
-            <Card className="border-0 shadow-sm mb-4">
-                <Card.Body>
-                    <Form.Label className="small">
-                        Müşteriye Göre Filtrele
-                    </Form.Label>
+            {/* SELECT – Butonsuz, anlık */}
+            <Row className="mb-4">
+                <Col md={4}>
                     <Form.Select
                         value={customerId}
                         onChange={(e) => setCustomerId(e.target.value)}
@@ -85,8 +88,8 @@ function ServicePage() {
                             </option>
                         ))}
                     </Form.Select>
-                </Card.Body>
-            </Card>
+                </Col>
+            </Row>
 
             {/* LOADING */}
             {isLoading && (
@@ -98,7 +101,7 @@ function ServicePage() {
             {/* EMPTY */}
             {!isLoading && services.length === 0 && (
                 <p className="text-center text-light py-5">
-                    Kayıtlı servis bulunamadı.
+                    Seçilen müşteri için servis bulunamadı.
                 </p>
             )}
 
