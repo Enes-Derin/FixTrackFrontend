@@ -6,37 +6,43 @@ const getAuthHeader = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+/* ===================== THUNKS ===================== */
+
 export const getServices = createAsyncThunk(
-    "getServices",
-    async () => {
+    "services/getAll",
+    async (_, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get("/service-form", {
                 headers: getAuthHeader(),
             });
             return response.data.payload;
         } catch (error) {
-            throw error;
+            return rejectWithValue(
+                error.response?.data || "Servisler getirilemedi"
+            );
         }
     }
 );
 
 export const getServiceById = createAsyncThunk(
-    "getServiceById",
-    async (id) => {
+    "services/getById",
+    async (id, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(`/service-form/${id}`, {
                 headers: getAuthHeader(),
             });
             return response.data.payload;
         } catch (error) {
-            throw error;
+            return rejectWithValue(
+                error.response?.data || "Servis bulunamadı"
+            );
         }
     }
 );
 
 export const getServiceByCustomerId = createAsyncThunk(
-    "getServiceByCustomerId",
-    async (id) => {
+    "services/getByCustomerId",
+    async (id, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(
                 `/service-form/customerId/${id}`,
@@ -46,48 +52,61 @@ export const getServiceByCustomerId = createAsyncThunk(
             );
             return response.data.payload;
         } catch (error) {
-            throw error;
+            return rejectWithValue(
+                error.response?.data || "Müşteriye ait servisler getirilemedi"
+            );
         }
     }
 );
 
 export const addService = createAsyncThunk(
-    "addService",
-    async (service) => {
+    "services/add",
+    async (service, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post("/service-form", service, {
-                headers: getAuthHeader(),
-            });
+            const response = await axiosInstance.post(
+                "/service-form",
+                service,
+                {
+                    headers: getAuthHeader(),
+                }
+            );
             return response.data.payload;
         } catch (error) {
-            throw error;
+            return rejectWithValue(
+                error.response?.data || "Servis eklenemedi"
+            );
         }
     }
 );
 
 export const deleteService = createAsyncThunk(
-    "deleteService",
-    async (id) => {
+    "services/delete",
+    async (id, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.delete(`/service-form/delete/${id}`, {
+            await axiosInstance.delete(`/service-form/delete/${id}`, {
                 headers: getAuthHeader(),
             });
-            return response.data.payload;
+            return id; // 🔴 backend bağımsız, güvenli
         } catch (error) {
-            throw error;
+            return rejectWithValue(
+                error.response?.data || "Servis silinemedi"
+            );
         }
     }
 );
 
 export const updateServiceSignature = createAsyncThunk(
-    "updateServiceSignature",
-    async ({ id, customerSignature, technicianSignature }) => {
+    "services/updateSignature",
+    async (
+        { id, customerSignature, technicianSignature },
+        { rejectWithValue }
+    ) => {
         try {
             const response = await axiosInstance.put(
                 `/service-form/${id}/signatures`,
                 {
                     customerSignature: customerSignature || null,
-                    technicianSignature: technicianSignature || null
+                    technicianSignature: technicianSignature || null,
                 },
                 {
                     headers: getAuthHeader(),
@@ -95,13 +114,16 @@ export const updateServiceSignature = createAsyncThunk(
             );
             return response.data.payload;
         } catch (error) {
-            throw error;
+            return rejectWithValue(
+                error.response?.data || "İmzalar güncellenemedi"
+            );
         }
     }
 );
 
+/* ===================== SLICE ===================== */
 
-export const serviciesSlice = createSlice({
+export const servicesSlice = createSlice({
     name: "services",
     initialState: {
         services: [],
@@ -112,18 +134,22 @@ export const serviciesSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+
+            /* GET ALL */
             .addCase(getServices.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
             .addCase(getServices.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.services = action.payload;
+                state.services = action.payload || [];
             })
             .addCase(getServices.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             })
+
+            /* GET BY ID */
             .addCase(getServiceById.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -134,20 +160,24 @@ export const serviciesSlice = createSlice({
             })
             .addCase(getServiceById.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             })
+
+            /* GET BY CUSTOMER */
             .addCase(getServiceByCustomerId.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
             .addCase(getServiceByCustomerId.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.services = action.payload;
+                state.services = action.payload || [];
             })
             .addCase(getServiceByCustomerId.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             })
+
+            /* ADD */
             .addCase(addService.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -158,8 +188,10 @@ export const serviciesSlice = createSlice({
             })
             .addCase(addService.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             })
+
+            /* DELETE */
             .addCase(deleteService.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -167,13 +199,15 @@ export const serviciesSlice = createSlice({
             .addCase(deleteService.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.services = state.services.filter(
-                    (service) => service.id !== action.payload.id
+                    (service) => service.id !== action.payload
                 );
             })
             .addCase(deleteService.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             })
+
+            /* UPDATE SIGNATURE */
             .addCase(updateServiceSignature.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -181,9 +215,14 @@ export const serviciesSlice = createSlice({
             .addCase(updateServiceSignature.fulfilled, (state, action) => {
                 state.isLoading = false;
                 const updatedService = action.payload;
-                if (state.service && state.service.id === updatedService.id) {
+
+                if (
+                    state.service &&
+                    state.service.id === updatedService.id
+                ) {
                     state.service = updatedService;
                 }
+
                 const index = state.services.findIndex(
                     (s) => s.id === updatedService.id
                 );
@@ -193,9 +232,9 @@ export const serviciesSlice = createSlice({
             })
             .addCase(updateServiceSignature.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             });
     },
 });
 
-export default serviciesSlice.reducer;
+export default servicesSlice.reducer;
