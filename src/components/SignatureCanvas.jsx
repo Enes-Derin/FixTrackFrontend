@@ -15,7 +15,50 @@ function SignatureCanvas({
     const [isDrawing, setIsDrawing] = useState(false);
     const [hasSignature, setHasSignature] = useState(false);
     const [hasSaved, setHasSaved] = useState(false);
+    const lockScroll = () => {
+        document.body.classList.add("no-scroll");
+    };
 
+    const unlockScroll = () => {
+        document.body.classList.remove("no-scroll");
+    };
+
+    const startDrawing = useCallback(
+        (e) => {
+            if (readOnly) return;
+            e.preventDefault();
+            lockScroll();
+
+            const { x, y } = getPosition(e);
+            ctxRef.current.beginPath();
+            ctxRef.current.moveTo(x, y);
+            setIsDrawing(true);
+        },
+        [readOnly]
+    );
+    const stopDrawing = useCallback(() => {
+        setIsDrawing(false);
+        unlockScroll();
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            document.body.classList.remove("no-scroll");
+        };
+    }, []);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const preventScroll = (e) => e.preventDefault();
+
+        canvas.addEventListener("touchmove", preventScroll, { passive: false });
+
+        return () => {
+            canvas.removeEventListener("touchmove", preventScroll);
+        };
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -66,18 +109,6 @@ function SignatureCanvas({
     };
 
 
-    const startDrawing = useCallback(
-        (e) => {
-            if (readOnly) return;
-            e.preventDefault();
-            const { x, y } = getPosition(e);
-            ctxRef.current.beginPath();
-            ctxRef.current.moveTo(x, y);
-            setIsDrawing(true);
-        },
-        [readOnly]
-    );
-
     const draw = useCallback(
         (e) => {
             if (!isDrawing || readOnly) return;
@@ -90,9 +121,7 @@ function SignatureCanvas({
         [isDrawing, readOnly]
     );
 
-    const stopDrawing = useCallback(() => {
-        setIsDrawing(false);
-    }, []);
+
 
     const clearCanvas = () => {
         if (readOnly) return;
@@ -135,6 +164,7 @@ function SignatureCanvas({
                 style={{
                     height: CANVAS_HEIGHT,
                     cursor: readOnly ? "default" : "crosshair",
+                    touchAction: "none",   // ✅ BURAYA
                 }}
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
