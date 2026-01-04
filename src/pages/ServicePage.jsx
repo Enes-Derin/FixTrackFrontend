@@ -26,14 +26,14 @@ function ServicePage() {
 
     const [customerId, setCustomerId] = useState("");
 
-    /* İlk yükleme */
+    /* 
+        TEK VE DOĞRU USE EFFECT
+        - İlk yüklemede customerId = "" → tüm servisler
+        - Müşteri seçilince → o müşterinin servisleri
+    */
     useEffect(() => {
-        dispatch(getServices());
         dispatch(getCustomers());
-    }, [dispatch]);
 
-    /* Müşteri seçilince otomatik filtre */
-    useEffect(() => {
         if (customerId) {
             dispatch(getServiceByCustomerId(customerId));
         } else {
@@ -74,7 +74,7 @@ function ServicePage() {
                 </Col>
             </Row>
 
-            {/* SELECT – Butonsuz, anlık */}
+            {/* SELECT */}
             <Row className="mb-4">
                 <Col md={4}>
                     <Form.Select
