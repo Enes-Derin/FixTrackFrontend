@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "../config/config";
-import { store } from "../store/store";
+import { store } from "../redux/store";
 import { setAccessToken } from "../redux/authSlice";
 
 const axiosInstance = axios.create({
