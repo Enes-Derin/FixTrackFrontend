@@ -1,7 +1,5 @@
 import axios from "axios";
 import config from "../config/config";
-import { store } from "../redux/store";
-import { setAccessToken } from "../redux/authSlice";
 
 const axiosInstance = axios.create({
     baseURL: config.API_BASE_URL,
