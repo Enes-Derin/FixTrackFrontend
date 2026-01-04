@@ -17,7 +17,7 @@ import {
 function LoginPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { loading, error } = useSelector((state) => state.auth);
+    const { isLoading, error } = useSelector((state) => state.auth);
 
     const initialValues = {
         username: "",
@@ -127,9 +127,9 @@ function LoginPage() {
                                                 <Button
                                                     type="submit"
                                                     className="premium-btn fw-bold shadow-sm"
-                                                    disabled={loading}
+                                                    disabled={isLoading}
                                                 >
-                                                    {loading ? (
+                                                    {isLoading ? (
                                                         <>
                                                             <Spinner animation="border" size="sm" /> Giriş yapılıyor...
                                                         </>
