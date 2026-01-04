@@ -215,6 +215,12 @@ canvas {
     color: var(--text-soft) !important;
 }
 
+
+.no-scroll {
+    overflow: hidden;
+    touch-action: none;
+}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
     .card {
