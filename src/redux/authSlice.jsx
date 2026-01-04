@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../api/axiosInstance";
 
-const BASE_URL = axiosInstance.defaults.baseURL;
-
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (data, { rejectWithValue }) => {
@@ -14,13 +12,11 @@ export const loginUser = createAsyncThunk(
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("role", role);
-            localStorage.setItem("user", JSON.stringify(user));
 
-            return response.data.payload;
+            return { accessToken, refreshToken, role, user };
         } catch (error) {
             return rejectWithValue(
-                error.response?.data?.exception?.message ||
-                "Giriş yapılamadı"
+                error.response?.data?.exception?.message || "Giriş yapılamadı"
             );
         }
     }
@@ -35,9 +31,9 @@ export const logoutUser = createAsyncThunk(
 );
 
 const initialState = {
-    user: JSON.parse(localStorage.getItem("user")) || null,
-    accessToken: localStorage.getItem("accessToken") || null,
-    refreshToken: localStorage.getItem("refreshToken") || null,
+    user: null,
+    accessToken: localStorage.getItem("accessToken"),
+    refreshToken: localStorage.getItem("refreshToken"),
     isLoading: false,
     error: null,
 };
@@ -69,6 +65,5 @@ const authSlice = createSlice({
             });
     },
 });
-
 
 export default authSlice.reducer;
