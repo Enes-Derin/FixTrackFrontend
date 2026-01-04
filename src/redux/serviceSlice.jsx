@@ -110,6 +110,18 @@ const servicesSlice = createSlice({
                 state.services = state.services.filter(
                     (s) => s.id !== action.payload
                 );
+            })
+            .addCase(getServiceById.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getServiceById.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.service = action.payload;
+            })
+            .addCase(getServiceById.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
             });
     },
 });
