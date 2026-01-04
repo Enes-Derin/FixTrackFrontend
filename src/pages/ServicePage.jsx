@@ -25,26 +25,22 @@ function ServicePage() {
     const customers = useSelector((state) => state.customer.customers);
 
     const [customerId, setCustomerId] = useState("");
-    const [isFiltered, setIsFiltered] = useState(false);
 
-    // İlk yükleme
+    /* İlk yükleme */
     useEffect(() => {
         dispatch(getServices());
         dispatch(getCustomers());
     }, [dispatch]);
 
-    // Filtre tetikleme
-    const handleFilter = () => {
+    /* Otomatik filtre */
+    useEffect(() => {
         if (customerId) {
-            setIsFiltered(true);
             dispatch(getServiceByCustomerId(customerId));
         } else {
-            setIsFiltered(false);
             dispatch(getServices());
         }
-    };
+    }, [customerId, dispatch]);
 
-    // Silme
     const deleteServiceById = (id) => {
         if (window.confirm("Bu servisi silmek istediğinizden emin misiniz?")) {
             dispatch(deleteService(id));
@@ -56,14 +52,16 @@ function ServicePage() {
             {/* HEADER */}
             <Row className="align-items-center mb-4">
                 <Col>
-                    <h3 className="text-primary fw-bold mb-1">Servis Yönetimi</h3>
+                    <h3 className="text-primary fw-bold mb-1">
+                        Servis Yönetimi
+                    </h3>
                     <p className="small text-light mb-0">
                         Tüm servis kayıtlarını buradan yönetin
                     </p>
                 </Col>
                 <Col className="text-end">
                     <Link to="/service/add">
-                        <Button className="custom-btn fw-semibold" size="sm">
+                        <Button size="sm" className="custom-btn">
                             + Yeni Servis
                         </Button>
                     </Link>
@@ -73,35 +71,20 @@ function ServicePage() {
             {/* FILTER */}
             <Card className="border-0 shadow-sm mb-4">
                 <Card.Body>
-                    <Row className="align-items-end g-3">
-                        <Col xs={12} md={9}>
-                            <Form.Label className="small">
-                                Müşteriye Göre Filtrele
-                            </Form.Label>
-                            <Form.Select
-                                value={customerId}
-                                onChange={(e) =>
-                                    setCustomerId(e.target.value)
-                                }
-                            >
-                                <option value="">Tüm Müşteriler</option>
-                                {customers.map((c) => (
-                                    <option key={c.id} value={c.id}>
-                                        {c.company}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Col>
-                        <Col xs={12} md={3}>
-                            <Button
-                                className="custom-btn w-100"
-                                onClick={handleFilter}
-                                disabled={isLoading}
-                            >
-                                Filtrele
-                            </Button>
-                        </Col>
-                    </Row>
+                    <Form.Label className="small">
+                        Müşteriye Göre Filtrele
+                    </Form.Label>
+                    <Form.Select
+                        value={customerId}
+                        onChange={(e) => setCustomerId(e.target.value)}
+                    >
+                        <option value="">Tüm Müşteriler</option>
+                        {customers.map((c) => (
+                            <option key={c.id} value={c.id}>
+                                {c.company}
+                            </option>
+                        ))}
+                    </Form.Select>
                 </Card.Body>
             </Card>
 
@@ -112,57 +95,42 @@ function ServicePage() {
                 </div>
             )}
 
-            {/* EMPTY STATE */}
+            {/* EMPTY */}
             {!isLoading && services.length === 0 && (
                 <p className="text-center text-light py-5">
-                    {isFiltered
-                        ? "Seçilen müşteriye ait servis bulunamadı."
-                        : "Henüz kayıtlı servis bulunmuyor."}
+                    Kayıtlı servis bulunamadı.
                 </p>
             )}
 
-            {/* SERVICE CARDS */}
+            {/* LIST */}
             <Row className="g-3">
                 {services.map((s) => (
                     <Col xs={12} md={6} lg={4} key={s.id}>
-                        <Card className="custom-card p-3 h-100 shadow-sm">
-                            <Card.Body className="d-flex flex-column justify-content-between h-100">
+                        <Card className="custom-card h-100 p-3 shadow-sm">
+                            <Card.Body className="d-flex flex-column justify-content-between">
                                 <div>
-                                    <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <div className="d-flex justify-content-between mb-2">
                                         <Card.Title className="fw-bold">
                                             {s.title}
                                         </Card.Title>
                                         <Badge bg="secondary">
-                                            {s.customer?.company || "—"}
+                                            {s.customer?.company || "-"}
                                         </Badge>
                                     </div>
 
                                     <Card.Text className="small">
-                                        {s.description
-                                            ? s.description.length > 70
-                                                ? s.description.slice(0, 70) +
-                                                "..."
-                                                : s.description
-                                            : "-"}
+                                        {s.description || "-"}
                                     </Card.Text>
-
-                                    <div className="small mt-1">
-                                        {s.createdDate
-                                            ? new Date(
-                                                s.createdDate
-                                            ).toLocaleDateString("tr-TR")
-                                            : "-"}
-                                    </div>
                                 </div>
 
-                                <div className="mt-3 d-flex gap-2">
+                                <div className="d-flex gap-2 mt-3">
                                     <Link
                                         to={`/service/${s.id}`}
-                                        className="flex-fill text-decoration-none"
+                                        className="flex-fill"
                                     >
                                         <Button
-                                            variant="outline-secondary"
                                             size="sm"
+                                            variant="outline-secondary"
                                             className="w-100"
                                         >
                                             Görüntüle
@@ -170,8 +138,8 @@ function ServicePage() {
                                     </Link>
 
                                     <Button
-                                        variant="outline-danger"
                                         size="sm"
+                                        variant="outline-danger"
                                         className="w-100"
                                         onClick={() =>
                                             deleteServiceById(s.id)

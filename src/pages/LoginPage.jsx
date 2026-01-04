@@ -41,100 +41,81 @@ function LoginPage() {
             className="d-flex justify-content-center align-items-center min-vh-100"
             style={{
                 background:
-                    "linear-gradient(135deg, rgba(52,152,219,0.1), rgba(26,37,47,0.9)), url('https://www.transparenttextures.com/patterns/concrete-wall.png')",
-                backgroundSize: "cover",
+                    "linear-gradient(135deg, rgba(52,152,219,0.1), rgba(26,37,47,0.9))",
             }}
         >
             <Container>
                 <Row className="justify-content-center">
                     <Col xs={10} sm={8} md={6} lg={4}>
-                        <Card
-                            className="p-4 shadow-lg border-0"
-                            style={{
-                                borderRadius: "12px",
-                                background: "var(--bg-card)",
-                                backdropFilter: "blur(10px)",
-                            }}
-                        >
+                        <Card className="p-4 shadow-lg border-0">
                             <Card.Body>
-                                {/* Header */}
                                 <div className="text-center mb-4">
-                                    <h2 className="fw-bold text-primary mb-2" style={{ textShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>
-                                        FixTrack
-                                    </h2>
-                                    <p className="text-light mb-3">
+                                    <h2 className="fw-bold text-primary">FixTrack</h2>
+                                    <p className="text-muted">
                                         Teknik Servis Yönetim Sistemi
                                     </p>
                                 </div>
 
-                                {/* Form */}
                                 <Formik
-                                    enableReinitialize
                                     initialValues={initialValues}
                                     validationSchema={validationSchema}
                                     onSubmit={handleSubmit}
                                 >
-                                    {({ values }) => (
+                                    {() => (
                                         <Form>
-                                            {/* Username */}
                                             <div className="mb-3">
-                                                <label className="form-label fw-semibold">
+                                                <label className="form-label">
                                                     Kullanıcı Adı
                                                 </label>
                                                 <Field
                                                     name="username"
                                                     type="text"
-                                                    value={values.username || ""}
                                                     className="form-control"
-                                                    placeholder="Kullanıcı adınızı girin"
                                                 />
                                                 <ErrorMessage
                                                     name="username"
                                                     component="div"
-                                                    className="text-danger small mt-1"
+                                                    className="text-danger small"
                                                 />
                                             </div>
 
-                                            {/* Password */}
                                             <div className="mb-3">
-                                                <label className="form-label fw-semibold">Şifre</label>
+                                                <label className="form-label">Şifre</label>
                                                 <Field
                                                     name="password"
                                                     type="password"
-                                                    value={values.password || ""}
                                                     className="form-control"
-                                                    placeholder="Şifrenizi girin"
                                                 />
                                                 <ErrorMessage
                                                     name="password"
                                                     component="div"
-                                                    className="text-danger small mt-1"
+                                                    className="text-danger small"
                                                 />
                                             </div>
 
-                                            {/* Error Alert */}
                                             {error && (
-                                                <Alert
-                                                    variant="danger"
-                                                    className="py-2 text-center shadow-sm"
-                                                >
+                                                <Alert variant="danger" className="text-center">
                                                     {error}
                                                 </Alert>
                                             )}
 
-                                            {/* Submit */}
                                             <div className="d-grid mt-4">
                                                 <Button
                                                     type="submit"
-                                                    className="premium-btn fw-bold shadow-sm"
                                                     disabled={loading}
+                                                    className="fw-bold"
                                                 >
                                                     {loading ? (
                                                         <>
-                                                            <Spinner animation="border" size="sm" /> Giriş yapılıyor...
+                                                            <Spinner
+                                                                animation="border"
+                                                                size="sm"
+                                                                className="me-2"
+                                                            />
+                                                            Giriş yapılıyor...
                                                         </>
                                                     ) : (
-                                                        "🔑 Giriş Yap"
+                                                        "Giriş Yap"
                                                     )}
                                                 </Button>
                                             </div>
@@ -142,9 +123,8 @@ function LoginPage() {
                                     )}
                                 </Formik>
 
-                                {/* Footer */}
-                                <p className="text-center text-light mt-4 small">
-                                    © {new Date().getFullYear()} FixTrack Teknik Servis - Tüm hakları saklıdır.
+                                <p className="text-center text-muted mt-4 small">
+                                    © {new Date().getFullYear()} FixTrack
                                 </p>
                             </Card.Body>
                         </Card>
